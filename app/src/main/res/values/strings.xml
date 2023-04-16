@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">My Application</string>
+
+    <string name="first_input_label">Glass</string>
+    <string-array name="first_input">
+        <item>Cocktail_glass</item>
+        <item>Champagne_flute</item>
+    </string-array>
+
+    <string name="second_input_label">Ingredient</string>
+    <string name="second_input">Vodka</string>
+    <string name="get">GET</string>
+
 </resources>

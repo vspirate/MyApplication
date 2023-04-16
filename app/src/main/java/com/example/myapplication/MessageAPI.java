@@ -1,12 +1,21 @@
 package com.example.myapplication;
 
 
+import com.example.myapplication.model.Drink;
+import com.example.myapplication.model.DrinkShort;
+import com.example.myapplication.model.DrinksList;
+
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface MessageAPI {
-    @POST("/v1/weather/Forecast")
-    Call<Weather> getWeatherByCityName(@Query( "location" ) String city, @Query ( "days" ) String forecast_days);
+    @POST("/api/json/v1/1/filter.php")
+    Call<DrinksList> getWeatherByCityName(@Query( "g" ) String glass, @Query ( "i" ) String ingredient);
+
+    @POST("/api/json/v1/1/lookup.php")
+    Call<Drink> getById(@Query("i") String id);
 
 }
