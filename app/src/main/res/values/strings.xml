@@ -7,8 +7,8 @@
         <item>Champagne_flute</item>
     </string-array>
 
-    <string name="second_input_label">Ingredient</string>
-    <string name="second_input">Vodka</string>
+    <string name="second_input_label">City</string>
+    <string name="second_input">Kiev</string>
     <string name="get">GET</string>
 
 </resources>

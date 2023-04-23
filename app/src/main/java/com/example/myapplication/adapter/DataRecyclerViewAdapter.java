@@ -13,19 +13,22 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model.Drink;
+import com.example.myapplication.model.weather.List;
+import com.example.myapplication.model.weather.Main;
+import com.example.myapplication.model.weather.Model;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerViewAdapter.ViewHolder> {
-    private final ArrayList<Pair<Bitmap, Drink.Data>> mData;//список даних, які будемо розміщувати в RecyclerView
+    private final java.util.List<Main> mData;//список даних, які будемо розміщувати в RecyclerView
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // передаємо дані в конструктор
-    public DataRecyclerViewAdapter(Context context, ArrayList<Pair<Bitmap, Drink.Data>> data) {
+    public DataRecyclerViewAdapter(Context context, Model data) {
         this.mInflater = LayoutInflater.from(context);
-        this.mData = data;
+        this.mData = data.getList().stream().map(List::getMain).collect(Collectors.toList());
     }
 
     // “створює(надуває)” рядок(пункт) RecyclerView з xml файлу
@@ -40,9 +43,8 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String animal = String.valueOf(mData.get(position));
-        holder.imageView.setImageBitmap(mData.get(position).first);
-        holder.textName.setText(mData.get(position).second.getStrDrink());
-        holder.textReceipt.setText(mData.get(position).second.getStrInstructions());
+        holder.textTemp.setText(String.valueOf(mData.get(position).getTemp()));
+        holder.textHum.setText(String.valueOf(mData.get(position).getHumidity()));
     }
 
     // загальна кількість рядків
@@ -53,16 +55,14 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
 
     // зберігає та використовує view компоненти, коли рядок прокручується (виходить з екрана)
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        ImageView imageView;
-        TextView textName;
-        TextView textReceipt;
+        TextView textTemp;
+        TextView textHum;
 
 
         ViewHolder(View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.imageView);
-            textName = itemView.findViewById(R.id.textName);
-            textReceipt = itemView.findViewById(R.id.textReceipt);
+            textTemp = itemView.findViewById(R.id.textTemp);
+            textHum = itemView.findViewById(R.id.textHum);
             itemView.setOnClickListener(this);
         }
 
@@ -72,10 +72,6 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
         }
     }
 
-    // отримання даних з рядка RecyclerView, за яким клацнули
-    Pair<Bitmap, Drink.Data> getItem(int id) {
-        return mData.get(id);
-    }
 
     // додавання можливості перехата натискання на кнопку
     public void setClickListener(ItemClickListener itemClickListener) {
