@@ -41,7 +41,7 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
     public void onBindViewHolder(ViewHolder holder, int position) {
         String animal = String.valueOf(mData.get(position));
         holder.imageView.setImageBitmap(mData.get(position).first);
-        holder.textName.setText(mData.get(position).second.getStrDrink());
+        holder.textName.setText(((Drink.Data)mData.get(position).second).getStrDrink());
         holder.textReceipt.setText(mData.get(position).second.getStrInstructions());
     }
 

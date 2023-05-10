@@ -11,10 +11,13 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.example.myapplication.model.Drink;
 import com.example.myapplication.model.DrinkShort;
 import com.example.myapplication.model.DrinksList;
+import com.example.myapplication.model.db.DrinkDB;
 
 import java.util.List;
 
@@ -49,12 +52,14 @@ public class MainActivity extends AppCompatActivity {
         MessageAPI messageAPI = retrofit.create(MessageAPI.class);
 
 
+
         squareButton.setOnClickListener(v -> {
             EditText forecastDaysEdit = findViewById(R.id.forecastDaysEdit);
             messageAPI.getWeatherByCityName(spinner.getSelectedItem().toString(), forecastDaysEdit.getText().toString()).enqueue(new Callback<DrinksList>() {
                 @Override
                 public void onResponse(@NonNull Call<DrinksList> call, @NonNull Response<DrinksList> response) {
-                    switchActivities(response.body());
+                    DrinksList drinksList = response.body();
+                    switchActivities(drinksList);
                 }
 
                 @Override

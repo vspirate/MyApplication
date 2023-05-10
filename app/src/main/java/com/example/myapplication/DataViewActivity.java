@@ -14,11 +14,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.example.myapplication.adapter.DataRecyclerViewAdapter;
 import com.example.myapplication.model.Drink;
 import com.example.myapplication.model.DrinkShort;
 import com.example.myapplication.model.DrinksList;
+import com.example.myapplication.model.db.DrinkDB;
+import com.example.myapplication.model.db.DrinkEntity;
 import com.example.myapplication.utils.ImageDownloader;
 
 import java.util.ArrayList;
@@ -60,14 +64,19 @@ public class DataViewActivity extends AppCompatActivity  implements DataRecycler
                 .build();
         MessageAPI messageAPI = retrofit.create(MessageAPI.class);
 
+        RoomDatabase database= Room.databaseBuilder(getApplicationContext(), DrinkDB.class, "drinks")
+                .fallbackToDestructiveMigration()
+                .build();
+
         for (DrinkShort drink : ((DrinksList)getIntent().getSerializableExtra("drinks")).getDrinks()) {
             messageAPI.getById(drink.getIdDrink()).enqueue(new Callback<Drink>() {
                 @Override
                 public void onResponse(@NonNull Call<Drink> call, @NonNull Response<Drink> response) {
-                    assert response.body() != null;
+                    if( response.body() == null)return;
                     Log.i("Debug", String.valueOf(((Drink)response.body()).getDrinks().get(0)));
                     executor.execute(() -> {
                         Drink.Data drink1 = ((Drink)response.body()).getDrinks().get(0);
+                        ((DrinkDB)database).drinkDao().insertDrink(new DrinkEntity(drink1));
                         Pair<Bitmap, Drink.Data> drinkWithImage = new Pair<>(ImageDownloader.downloadImagesByUrl(drink1.getStrDrinkThumb()+"/preview"), drink1);
                         //Background work here
                         handler.post(() -> {
