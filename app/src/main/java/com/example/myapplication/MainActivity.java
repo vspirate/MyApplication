@@ -3,7 +3,6 @@ package com.example.myapplication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,13 +10,10 @@ import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.room.Room;
-import androidx.room.RoomDatabase;
 
-import com.example.myapplication.model.Drink;
-import com.example.myapplication.model.DrinkShort;
 import com.example.myapplication.model.DrinksList;
-import com.example.myapplication.model.db.DrinkDB;
+import com.example.myapplication.model.db.DrinkEntity;
+import com.example.myapplication.repo.Repository;
 
 import java.util.List;
 
@@ -29,6 +25,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 
 public class MainActivity extends AppCompatActivity {
+    private Repository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,34 +42,19 @@ public class MainActivity extends AppCompatActivity {
 
         Button squareButton = findViewById(R.id.getButton);//описали змінну та зв’язали її з кнопкою
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.thecocktaildb.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        MessageAPI messageAPI = retrofit.create(MessageAPI.class);
+        repository=new Repository(this);
 
+        EditText forecastDaysEdit = findViewById(R.id.forecastDaysEdit);
 
 
         squareButton.setOnClickListener(v -> {
-            EditText forecastDaysEdit = findViewById(R.id.forecastDaysEdit);
-            messageAPI.getWeatherByCityName(spinner.getSelectedItem().toString(), forecastDaysEdit.getText().toString()).enqueue(new Callback<DrinksList>() {
-                @Override
-                public void onResponse(@NonNull Call<DrinksList> call, @NonNull Response<DrinksList> response) {
-                    DrinksList drinksList = response.body();
-                    switchActivities(drinksList);
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<DrinksList> call, @NonNull Throwable t) {
-                    Log.i("Volodymyr", "Failure " + t);
-                }
-            });
+            repository.getDrinks(spinner.getSelectedItem().toString(), forecastDaysEdit.getText().toString());
+            switchActivities();
         });
     }
 
-    private void switchActivities(DrinksList drinksList) {
+    private void switchActivities() {
         Intent switchActivityIntent = new Intent(this, DataViewActivity.class);
-        switchActivityIntent.putExtra("drinks", drinksList);
         startActivity(switchActivityIntent);
     }
 }

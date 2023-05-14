@@ -13,17 +13,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.myapplication.R;
-import com.example.myapplication.model.Drink;
+import com.example.myapplication.model.db.DrinkEntity;
 
 import java.util.ArrayList;
 
 public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerViewAdapter.ViewHolder> {
-    private final ArrayList<Pair<Bitmap, Drink.Data>> mData;//список даних, які будемо розміщувати в RecyclerView
+    private final ArrayList<Pair<Bitmap, DrinkEntity>> mData;//список даних, які будемо розміщувати в RecyclerView
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     // передаємо дані в конструктор
-    public DataRecyclerViewAdapter(Context context, ArrayList<Pair<Bitmap, Drink.Data>> data) {
+    public DataRecyclerViewAdapter(Context context, ArrayList<Pair<Bitmap, DrinkEntity>> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -41,7 +41,7 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
     public void onBindViewHolder(ViewHolder holder, int position) {
         String animal = String.valueOf(mData.get(position));
         holder.imageView.setImageBitmap(mData.get(position).first);
-        holder.textName.setText(((Drink.Data)mData.get(position).second).getStrDrink());
+        holder.textName.setText(((DrinkEntity)mData.get(position).second).getStrDrink());
         holder.textReceipt.setText(mData.get(position).second.getStrInstructions());
     }
 
@@ -73,7 +73,7 @@ public class DataRecyclerViewAdapter extends RecyclerView.Adapter<DataRecyclerVi
     }
 
     // отримання даних з рядка RecyclerView, за яким клацнули
-    Pair<Bitmap, Drink.Data> getItem(int id) {
+    Pair<Bitmap, DrinkEntity> getItem(int id) {
         return mData.get(id);
     }
 

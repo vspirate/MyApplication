@@ -1,5 +1,7 @@
 package com.example.myapplication.model.db;
 
+import android.graphics.Bitmap;
+
 import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -9,12 +11,13 @@ import com.example.myapplication.model.Drink;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @lombok.Data
 @Entity
 @AllArgsConstructor
-public class DrinkEntity {
+public class DrinkEntity implements Serializable {
         @PrimaryKey
         @NonNull
         public String idDrink = UUID.randomUUID().toString();

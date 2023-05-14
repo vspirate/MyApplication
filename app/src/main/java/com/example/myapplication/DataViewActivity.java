@@ -23,9 +23,12 @@ import com.example.myapplication.model.DrinkShort;
 import com.example.myapplication.model.DrinksList;
 import com.example.myapplication.model.db.DrinkDB;
 import com.example.myapplication.model.db.DrinkEntity;
+import com.example.myapplication.repo.Repository;
 import com.example.myapplication.utils.ImageDownloader;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -43,11 +46,13 @@ public class DataViewActivity extends AppCompatActivity  implements DataRecycler
     ExecutorService executor = Executors.newSingleThreadExecutor();
     Handler handler = new Handler(Looper.getMainLooper());
 
+    private Repository repository;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_view);
-        ArrayList<Pair<Bitmap, Drink.Data>> drinks = new ArrayList<>();
+        ArrayList<Pair<Bitmap, DrinkEntity>> drinks = new ArrayList<>();
 
         recyclerView=findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -55,44 +60,17 @@ public class DataViewActivity extends AppCompatActivity  implements DataRecycler
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
+        repository=new Repository(this);
 
-
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://www.thecocktaildb.com")
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        MessageAPI messageAPI = retrofit.create(MessageAPI.class);
-
-        RoomDatabase database= Room.databaseBuilder(getApplicationContext(), DrinkDB.class, "drinks")
-                .fallbackToDestructiveMigration()
-                .build();
-
-        for (DrinkShort drink : ((DrinksList)getIntent().getSerializableExtra("drinks")).getDrinks()) {
-            messageAPI.getById(drink.getIdDrink()).enqueue(new Callback<Drink>() {
-                @Override
-                public void onResponse(@NonNull Call<Drink> call, @NonNull Response<Drink> response) {
-                    if( response.body() == null)return;
-                    Log.i("Debug", String.valueOf(((Drink)response.body()).getDrinks().get(0)));
-                    executor.execute(() -> {
-                        Drink.Data drink1 = ((Drink)response.body()).getDrinks().get(0);
-                        ((DrinkDB)database).drinkDao().insertDrink(new DrinkEntity(drink1));
-                        Pair<Bitmap, Drink.Data> drinkWithImage = new Pair<>(ImageDownloader.downloadImagesByUrl(drink1.getStrDrinkThumb()+"/preview"), drink1);
-                        //Background work here
-                        handler.post(() -> {
-                            drinks.add(drinkWithImage);
-                            adapter.notifyItemInserted(Integer.MAX_VALUE);//max value to scroll from top
-                        });
-                    });
-
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<Drink> call, @NonNull Throwable t) {
-
-                }
+        Executors.newSingleThreadExecutor().execute(()->{
+            List<Pair<Bitmap, DrinkEntity>> val = repository.getAllDrinks();
+            handler.post(() -> {
+                val.forEach(d->drinks.add(d));
+                adapter.notifyItemInserted(Integer.MAX_VALUE);//max value to scroll from top
             });
-        }
+
+        });
+
     }
 
     @Override
