@@ -2,30 +2,17 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.myapplication.model.DrinksList;
-import com.example.myapplication.model.db.DrinkEntity;
-import com.example.myapplication.repo.Repository;
-
-import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
+import androidx.lifecycle.ViewModelProvider;
 
 
 public class MainActivity extends AppCompatActivity {
-    private Repository repository;
+    private DrinkVewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,13 +29,15 @@ public class MainActivity extends AppCompatActivity {
 
         Button squareButton = findViewById(R.id.getButton);//описали змінну та зв’язали її з кнопкою
 
-        repository=new Repository(this);
+
+        viewModel = new ViewModelProvider( this ).get(DrinkVewModel. class );
+
 
         EditText forecastDaysEdit = findViewById(R.id.forecastDaysEdit);
 
 
         squareButton.setOnClickListener(v -> {
-            repository.getDrinks(spinner.getSelectedItem().toString(), forecastDaysEdit.getText().toString());
+            viewModel.getDrinks(spinner.getSelectedItem().toString(), forecastDaysEdit.getText().toString());
             switchActivities();
         });
     }
