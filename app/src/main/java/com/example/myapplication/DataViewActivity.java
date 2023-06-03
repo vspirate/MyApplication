@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,10 +9,13 @@ import android.os.Looper;
 import android.util.Log;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
@@ -28,6 +32,7 @@ import com.example.myapplication.utils.ImageDownloader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -47,12 +52,20 @@ public class DataViewActivity extends AppCompatActivity  implements DataRecycler
     Handler handler = new Handler(Looper.getMainLooper());
 
     private Repository repository;
+    private ArrayList<Pair<Bitmap, DrinkEntity>> drinks = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if(getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE){
+            BlankFragment blankFragment=BlankFragment.newInstance("one", null);
+            getSupportFragmentManager().beginTransaction().add(R.id.fr_container,blankFragment).commit();
+        }
+
+
         setContentView(R.layout.activity_data_view);
-        ArrayList<Pair<Bitmap, DrinkEntity>> drinks = new ArrayList<>();
+
 
         recyclerView=findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -75,6 +88,24 @@ public class DataViewActivity extends AppCompatActivity  implements DataRecycler
 
     @Override
     public void onItemClick(View view, int position) {
+        if(getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE){
+
+            switchFragment(UUID.randomUUID().toString(), drinks.get(position).second);
+        }
+    }
+
+    void switchFragment(String name, DrinkEntity entity) {
+
+        Fragment fragment;
+        fragment = getSupportFragmentManager().findFragmentByTag(name);
+        if (fragment ==null) {
+            fragment = BlankFragment.newInstance(name, entity);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fr_container, fragment, name).commit();
+        }
+        else {
+            Toast.makeText(this,"Не меняем", Toast.LENGTH_SHORT).show();
+            Log.i("Main","Не меняем");
+        }
 
     }
 }
